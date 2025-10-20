@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Data Staff</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -12,16 +12,14 @@
     <div class="sidebar">
       <div class="logo">
         <h2><i class="fas fa-chart-line"></i> Dashboard</h2>
-        <p id="userEmail" style="font-size:.85em;color:#bbb;margin-top:5px">Memuat...</p>
+        <p id="userEmail">Memuat...</p>
       </div>
       <ul class="menu">
-        <li class="menu-item active" data-content="home"><i class="fas fa-home"></i><span>Dashboard Home</span></li>
-        <li class="menu-item" data-content="hatoribet"><i class="fas fa-users"></i><span>Data Staff Hatoribet</span></li>
-        <li class="menu-item" data-content="livitoto"><i class="fas fa-user-tie"></i><span>Data Staff Livitoto</span></li>
-        <li class="menu-item" data-content="hmd29"><i class="fas fa-user-friends"></i><span>Data Staff Hmd29</span></li>
-        <li class="menu-item" data-content="peraturan"><i class="fas fa-book"></i><span>Peraturan</span></li>
-        <li class="menu-item" data-content="noted"><i class="fas fa-sticky-note"></i><span>Noted</span></li>
-        <li class="menu-item" data-content="users"><i class="fas fa-user-circle"></i><span>Users</span></li>
+        <li class="menu-item active" data-content="home"><i class="fas fa-home"></i> Dashboard</li>
+        <li class="menu-item" data-content="hatoribet"><i class="fas fa-users"></i> Hatoribet</li>
+        <li class="menu-item" data-content="livitoto"><i class="fas fa-user-tie"></i> Livitoto</li>
+        <li class="menu-item" data-content="hmd29"><i class="fas fa-user-friends"></i> HMD29</li>
+        <li class="menu-item" data-content="users"><i class="fas fa-user-circle"></i> Users</li>
       </ul>
     </div>
 
@@ -32,51 +30,14 @@
           <h1 id="pageTitle">Dashboard Home</h1>
         </div>
         <div class="header-right">
-          <div class="user-profile">
-            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=0366d6&color=fff" style="width:40px;height:40px;border-radius:50%;" alt="User">
-            <span id="userName" style="margin-left:8px">Memuat...</span>
-            <button id="logoutBtn" class="btn" style="margin-left:10px;background:#e74c3c;color:white;"><i class="fas fa-sign-out-alt"></i> Logout</button>
-          </div>
+          <span id="userName"></span>
+          <button id="logoutBtn" class="btn" style="background:#e74c3c;color:white"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
       </header>
-
-      <div class="content-area">
-        <div id="home-content" class="content-section active">
-          <h2>Selamat datang di Dashboard</h2>
-          <p>Setiap hari adalah kesempatan baru untuk berkembang 💪</p>
-        </div>
-      </div>
+      <div class="content-area" id="contentArea">Memuat...</div>
     </div>
   </div>
 
-  <!-- Firebase dashboard logic -->
-  <script type="module">
-    import { auth, db } from "./firebase.js";
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-    onAuthStateChanged(auth, async (user)=>{
-      if(!user){ location.href="index.html"; return; }
-
-      userEmail.textContent = user.email;
-      userName.textContent = user.email.split('@')[0];
-      userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email.split('@')[0])}`;
-
-      const isAdmin = user.email === "admin@company.com";
-      if(!isAdmin) document.querySelectorAll(".admin-only").forEach(btn=>btn.style.display='none');
-
-      try {
-        const snap = await getDocs(collection(db,"users"));
-        console.log("Data pengguna terambil:", snap.size);
-      } catch (err) {
-        console.warn("⚠️ Firestore belum aktif:", err.message);
-      }
-    });
-
-    logoutBtn.addEventListener("click", async ()=>{
-      await signOut(auth);
-      location.href="index.html";
-    });
-  </script>
+  <script type="module" src="script.js"></script>
 </body>
 </html>
