@@ -1,20 +1,21 @@
-// login.js — untuk halaman index.html (Login & Register)
+// login.js — fix redirect loop final 🔥
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
+  signOut
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import {
   getFirestore,
   doc,
   setDoc,
   serverTimestamp,
-  getDoc,
+  getDoc
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-// 🔧 Firebase config (pakai project lama)
+// 🔧 Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyClRE2w0JeSj81gkccPC1au3hG8lQYbLzw",
   authDomain: "dashboard-png.firebaseapp.com",
@@ -29,7 +30,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ===================== 🔥 FORM HANDLER =====================
+// 🧾 Login form
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 
@@ -37,63 +38,71 @@ const registerForm = document.getElementById("registerForm");
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
-    const password = document.getElementById("loginPassword").value;
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
 
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      console.log("✅ Login sukses:", email);
+      const res = await signInWithEmailAndPassword(auth, email, password);
+      await ensureUserDoc(res.user);
+      sessionStorage.setItem("fromLogin", "true");
       window.location.href = "dashboard.html";
     } catch (err) {
-      alert("Login gagal: " + err.message);
+      alert("❌ Login gagal: " + err.message);
     }
   });
 }
 
-// 🧾 REGISTER (buat user baru di Firestore juga)
+// 🧾 REGISTER
 if (registerForm) {
   registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    const email = document.getElementById("registerEmail").value.trim();
+    const password = document.getElementById("registerPassword").value.trim();
     const name = document.getElementById("registerName").value.trim();
-    const email = document.getElementById("registerEmail").value.trim().toLowerCase();
-    const password = document.getElementById("registerPassword").value;
-    const confirm = document.getElementById("registerConfirmPassword").value;
-
-    if (password !== confirm) return alert("Konfirmasi password tidak cocok!");
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      // cek apakah sudah ada doc user (hindari dobel)
-      const userRef = doc(db, "users", user.uid);
-      const userSnap = await getDoc(userRef);
-      if (!userSnap.exists()) {
-        const isAdmin = email === "admin@company.com";
-        await setDoc(userRef, {
-          uid: user.uid,
-          email: user.email,
-          username: name || user.email.split("@")[0],
-          role: isAdmin ? "admin" : "staff",
-          canEdit: isAdmin,
-          createdAt: serverTimestamp(),
-        });
-      }
-
-      alert("✅ Registrasi berhasil! Silakan login.");
-      registerForm.reset();
-      window.location.reload(); // balik ke form login
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      await ensureUserDoc(res.user, name);
+      sessionStorage.setItem("fromLogin", "true");
+      window.location.href = "dashboard.html";
     } catch (err) {
-      alert("Gagal daftar: " + err.message);
+      alert("❌ Gagal daftar: " + err.message);
     }
   });
 }
 
-// ===================== 🔁 CEK LOGIN =====================
-// kalau user sudah login & saat ini di index.html, arahkan ke dashboard
+// 🔥 Pastikan dokumen user di Firestore
+async function ensureUserDoc(user, name = null) {
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) {
+    const isAdmin = user.email === "admin@company.com";
+    await setDoc(ref, {
+      uid: user.uid,
+      email: user.email,
+      username: name || user.email.split("@")[0],
+      role: isAdmin ? "admin" : "staff",
+      canEdit: isAdmin,
+      createdAt: serverTimestamp(),
+    });
+  }
+}
+
+// 🚫 FIX: Jangan auto-redirect kalau cuma refresh index.html
 onAuthStateChanged(auth, (user) => {
-  if (user && !window.location.href.includes("dashboard.html")) {
-    console.log("🔁 Sudah login, langsung ke dashboard:", user.email);
-    window.location.href = "dashboard.html";
+  const currentPage = window.location.pathname.split("/").pop();
+
+  // Kalau user di dashboard tapi belum login → balik ke login
+  if (!user && currentPage === "dashboard.html") {
+    window.location.href = "index.html";
+  }
+
+  // Kalau user login tapi sedang di index.html → redirect cuma kalau habis login/register
+  if (user && currentPage === "index.html") {
+    const fromLogin = sessionStorage.getItem("fromLogin");
+    if (fromLogin === "true") {
+      sessionStorage.removeItem("fromLogin");
+      window.location.href = "dashboard.html";
+    }
   }
 });
