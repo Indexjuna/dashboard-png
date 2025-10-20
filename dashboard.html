@@ -81,51 +81,52 @@
         </div>
     </div>
 
-    <script type="module">
-        // Import Firebase modules
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
 
-        // Konfigurasi Firebase kamu
-        const firebaseConfig = {
-            apiKey: "AIzaSyClRE2w0JeSj81gkccPC1au3hG8lQYbLzw",
-            authDomain: "dashboard-png.firebaseapp.com",
-            projectId: "dashboard-png",
-            storageBucket: "dashboard-png.firebasestorage.app",
-            messagingSenderId: "121187805643",
-            appId: "1:121187805643:web:6c67dd587abbe09f782e4e",
-            measurementId: "G-N5MV2N5X33"
-        };
+  const firebaseConfig = {
+    apiKey: "AIzaSyClRE2w0JeSj81gkccPC1au3hG8lQYbLzw",
+    authDomain: "dashboard-png.firebaseapp.com",
+    projectId: "dashboard-png",
+    storageBucket: "dashboard-png.firebasestorage.app",
+    messagingSenderId: "121187805643",
+    appId: "1:121187805643:web:6c67dd587abbe09f782e4e",
+    measurementId: "G-N5MV2N5X33"
+  };
 
-        // Inisialisasi Firebase
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
+  // 🔥 Inisialisasi Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
 
-        // Elemen DOM
-        const logoutBtn = document.getElementById('logoutBtn');
-        const userName = document.getElementById('userName');
-        const userAvatar = document.getElementById('userAvatar');
+  // 🔐 Cek apakah user login
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      // Kalau belum login, lempar balik ke halaman login
+      window.location.href = "login.html";
+    } else {
+      console.log("User terdeteksi:", user.email);
+      const profile = document.querySelector('.user-profile span');
+      if (profile) profile.textContent = user.email;
 
-        // Cek user login
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                const name = user.displayName || "User";
-                const email = user.email;
-                userName.textContent = name + " (" + email + ")";
-                userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0366d6&color=fff`;
-            } else {
-                // Kalau belum login, balik ke login.html
-                window.location.href = "login.html";
-            }
-        });
+      // Tambahkan tombol logout
+      const headerRight = document.querySelector('.header-right');
+      const logoutBtn = document.createElement('button');
+      logoutBtn.textContent = "Logout";
+      logoutBtn.classList.add("btn-secondary");
+      logoutBtn.style.marginLeft = "10px";
+      headerRight.appendChild(logoutBtn);
 
-        // Logout
-        logoutBtn.addEventListener('click', async () => {
-            await signOut(auth);
-            window.location.href = "login.html";
-        });
-    </script>
+      logoutBtn.addEventListener('click', async () => {
+        await signOut(auth);
+        window.location.href = "login.html";
+      });
+    }
+  });
+</script>
+
 
     <script src="script.js"></script>
 </body>
 </html>
+
