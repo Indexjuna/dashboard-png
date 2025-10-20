@@ -56,7 +56,7 @@
           </div>
         </div>
 
-        <!-- Konten lainnya tetap -->
+        <!-- (konten lain tetap sama seperti file kamu sebelumnya) -->
       </div>
     </div>
   </div>
@@ -66,6 +66,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
+    // Firebase Config kamu
     const firebaseConfig = {
       apiKey: "AIzaSyClRE2w0JeSj81gkccPC1au3hG8lQYbLzw",
       authDomain: "dashboard-png.firebaseapp.com",
@@ -76,14 +77,15 @@
       measurementId: "G-N5MV2N5X33"
     };
 
+    // Inisialisasi Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // 🔐 Cek status login
+    // 🔐 Cek status login user
     onAuthStateChanged(auth, (user) => {
       if (!user) {
-        // Kalau belum login, lempar balik ke halaman login utama
-        window.location.href = "dashboard.html";
+        // kalau belum login, arahkan ke halaman login (index.html)
+        window.location.href = "index.html";
       } else {
         console.log("✅ Login terdeteksi:", user.email);
         document.getElementById("userEmail").textContent = user.email;
@@ -92,15 +94,15 @@
       }
     });
 
-    // 🚪 Logout handler
+    // 🚪 Tombol Logout
     document.getElementById("logoutBtn").addEventListener("click", async () => {
       await signOut(auth);
-      window.location.href = "dashboard.html";
+      // setelah logout, balik ke halaman login (index.html)
+      window.location.href = "index.html";
     });
   </script>
 
+  <!-- File JS tambahan -->
   <script src="script.js"></script>
 </body>
 </html>
-
-
