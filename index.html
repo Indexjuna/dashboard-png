@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    /* Gaya asli kamu (tetap sama) */
+    /* Gaya kamu tetap sama */
     .login-container { min-height:100vh; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg,#667eea 0%,#764ba2 100%); padding:20px; position:relative; overflow:hidden; }
     .login-container::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(255,255,255,0.05) 0%, transparent 50%);animation:rotate 20s linear infinite;}
     @keyframes rotate{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
@@ -79,16 +79,16 @@
 
   <!-- Firebase + Auth -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    // config project (dashboard-png)
+    // ✅ Konfigurasi Firebase YANG BENAR
     const firebaseConfig = {
       apiKey: "AIzaSyClRE2w0JeSj81gkccPC1au3hG8lQYbLzw",
       authDomain: "dashboard-png.firebaseapp.com",
       projectId: "dashboard-png",
-      storageBucket: "dashboard-png.firebasestorage.app",
+      storageBucket: "dashboard-png.appspot.com", // ✅ fix di sini
       messagingSenderId: "121187805643",
       appId: "1:121187805643:web:6c67dd587abbe09f782e4e",
       measurementId: "G-N5MV2N5X33"
@@ -98,7 +98,6 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // UI refs
     const tabs = document.querySelectorAll('.login-tab');
     const forms = document.querySelectorAll('.login-form');
     const errorBox = document.getElementById('errorMessage');
@@ -118,12 +117,10 @@
       });
     });
 
-    // helper: create user doc in 'users' collection
     async function ensureUserDoc(userAuth, displayName) {
       const usersRef = doc(db, 'users', userAuth.uid);
       const snap = await getDoc(usersRef);
       if (!snap.exists()) {
-        // jika email admin@company.com maka jadikan admin
         const isAdminEmail = userAuth.email === 'admin@company.com';
         await setDoc(usersRef, {
           uid: userAuth.uid,
@@ -166,7 +163,6 @@
       if (!email || !password) return showError('Harap isi semua field');
       try {
         const res = await signInWithEmailAndPassword(auth, email, password);
-        // jika user belum ada doc, buat
         await ensureUserDoc(res.user);
         showSuccess('Login berhasil. Mengalihkan...');
         setTimeout(()=>window.location.href='dashboard.html',700);
