@@ -23,7 +23,6 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-
 // ==================== ⚙️ Konfigurasi Firebase ====================
 const firebaseConfig = {
   apiKey: "AIzaSyClRE2w0JeSj81gkccPC1au3hG8lQYbLzw",
@@ -38,7 +37,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-
 
 // ==================== 🔐 State & Elemen ====================
 let currentUser = null;
@@ -68,61 +66,77 @@ const staffIdInput = document.getElementById('staffId');
 const editModeInput = document.getElementById('editMode');
 const activityList = document.getElementById('activityList');
 
-
 // ==================== 👤 Auth Listener ====================
 onAuthStateChanged(auth, async (user) => {
-  setTimeout(async () => {
-    if (!user) {
-      window.location.href = 'index.html';
-      return;
-    }
+  if (!user) {
+    window.location.href = 'index.html';
+    return;
+  }
 
-    currentUser = user;
-    try {
-      const userRef = doc(db, 'users', user.uid);
-      const userSnap = await getDoc(userRef);
+  currentUser = user;
+  try {
+    const userRef = doc(db, 'users', user.uid);
+    const userSnap = await getDoc(userRef);
 
-      if (userSnap.exists()) {
-        currentUserDoc = userSnap.data();
-      } else {
-        const defaultRole = user.email === 'admin@company.com' ? 'admin' : 'staff';
-        await addDoc(collection(db, 'users'), {
-          uid: user.uid,
-          email: user.email,
-          username: user.email.split('@')[0],
-          role: defaultRole,
-          canEdit: defaultRole === 'admin',
-          createdAt: serverTimestamp()
-        });
+    if (userSnap.exists()) {
+      currentUserDoc = userSnap.data();
+
+      // ✅ pastikan admin punya hak edit
+      if (currentUserDoc.email === "admin@company.com") {
+        currentUserDoc.role = "admin";
+        currentUserDoc.canEdit = true;
       }
 
-      isAdminOrCanEdit = !!(currentUserDoc?.canEdit);
-
-      // Update UI profile
-      const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUserDoc.username || user.email.split('@')[0])}&background=0366d6&color=fff`;
-      document.querySelector('.user-profile img').src = avatar;
-      document.querySelector('.user-profile span').textContent = currentUserDoc.username || user.email.split('@')[0];
-      document.getElementById('userEmail').textContent = user.email;
-
-      // Init dashboard
-      initDashboardEvents();
-      await loadAllStaff();
-      await loadActivities();
-      applyPermissionsUI();
-
-    } catch (err) {
-      console.error('Gagal ambil user:', err.message);
+    } else {
+      // buat doc baru kalau belum ada
+      const defaultRole = user.email === 'admin@company.com' ? 'admin' : 'staff';
+      await addDoc(collection(db, 'users'), {
+        uid: user.uid,
+        email: user.email,
+        username: user.email.split('@')[0],
+        role: defaultRole,
+        canEdit: defaultRole === 'admin',
+        createdAt: serverTimestamp()
+      });
+      currentUserDoc = { role: defaultRole, canEdit: defaultRole === 'admin' };
     }
-  }, 1000); // kasih delay biar nggak infinite redirect
-});
 
+    // ✅ baru set izin edit
+    isAdminOrCanEdit =
+      currentUserDoc.role === "admin" || currentUserDoc.canEdit === true;
+
+    // update UI profile
+    const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUserDoc.username || user.email.split('@')[0])}&background=0366d6&color=fff`;
+    document.querySelector('.user-profile img').src = avatar;
+    document.querySelector('.user-profile span').textContent =
+      currentUserDoc.username || user.email.split('@')[0];
+    document.getElementById('userEmail').textContent = user.email;
+
+    // kasih class khusus admin
+    if (isAdminOrCanEdit) {
+      document.body.classList.add("admin-role");
+    } else {
+      document.body.classList.remove("admin-role");
+    }
+
+    // Inisialisasi dashboard
+    initDashboardEvents();
+    await loadAllStaff();
+    await loadActivities();
+    applyPermissionsUI();
+
+    console.log("✅ Login sebagai:", currentUserDoc.role, "| canEdit:", currentUserDoc.canEdit);
+
+  } catch (err) {
+    console.error("❌ Gagal ambil data user:", err.message);
+  }
+});
 
 // ==================== 🚪 Logout ====================
 async function logout() {
   await signOut(auth);
   window.location.href = 'index.html';
 }
-
 
 // ==================== 🧭 Navigasi & UI ====================
 function initDashboardEvents() {
@@ -143,13 +157,12 @@ function initDashboardEvents() {
   menuToggle?.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
   document.getElementById('logoutBtn')?.addEventListener('click', logout);
 
-  // Restore active menu
+  // restore menu terakhir
   const saved = localStorage.getItem('activeMenu');
   if (saved) document.querySelector(`.menu-item[data-content="${saved}"]`)?.click();
 }
 
-
-// ==================== 🔒 Permissions (Admin Only) ====================
+// ==================== 🔒 Permissions ====================
 function applyPermissionsUI() {
   document.querySelectorAll('.admin-only').forEach(el => {
     el.style.display = isAdminOrCanEdit ? '' : 'none';
@@ -158,7 +171,6 @@ function applyPermissionsUI() {
     btn.style.display = isAdminOrCanEdit ? '' : 'none';
   });
 }
-
 
 // ==================== 👥 Firestore: CRUD Staff ====================
 async function addStaffToFirestore(data) {
@@ -173,7 +185,6 @@ async function updateStaffInFirestore(id, data) {
 async function deleteStaffFromFirestore(id) {
   await deleteDoc(doc(db, 'staff', id));
 }
-
 
 // ==================== 📋 Load Staff ====================
 async function loadAllStaff() {
@@ -193,17 +204,16 @@ async function loadAllStaff() {
     staffLivitotoCount.textContent = livitoto.length;
     staffHmd29Count.textContent = hmd29.length;
 
-    document.querySelector('.stat-number').textContent =
-      hatoribet.length + livitoto.length + hmd29.length;
+    const total = hatoribet.length + livitoto.length + hmd29.length;
+    document.querySelector('.stat-number').textContent = total;
 
     applyPermissionsUI();
   } catch (err) {
-    console.error('Gagal load staff:', err.message);
+    console.error('❌ Gagal load staff:', err.message);
   }
 }
 
-
-// ==================== 🧾 Render Table ====================
+// ==================== 🧾 Render Tabel ====================
 function renderStaffTable(tbody, list) {
   if (!tbody) return;
   tbody.innerHTML = '';
@@ -229,18 +239,17 @@ function renderStaffTable(tbody, list) {
     `;
 
     aksi.querySelector('.btn-delete').addEventListener('click', async () => {
-      if (!isAdminOrCanEdit) return alert('Tidak diizinkan.');
+      if (!isAdminOrCanEdit) return alert('❌ Tidak diizinkan.');
       if (!confirm('Hapus data staff ini?')) return;
       await deleteStaffFromFirestore(item.id);
       await loadAllStaff();
-      alert('Data dihapus.');
+      alert('✅ Data dihapus.');
     });
 
-    tr.appendChild(aksi);
     tbody.appendChild(tr);
+    tr.appendChild(aksi);
   });
 }
-
 
 // ==================== 🗓️ Activities ====================
 async function loadActivities() {
