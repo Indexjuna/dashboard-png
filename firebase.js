@@ -3,6 +3,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebas
 import { getAuth } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+// Konfigurasi Firebase Project kamu
 const firebaseConfig = {
   apiKey: "AIzaSyClRE2w0JeSj81gkccPC1au3hG8lQYbLzw",
   authDomain: "dashboard-png.firebaseapp.com",
@@ -13,6 +14,7 @@ const firebaseConfig = {
   measurementId: "G-N5MV2N5X33"
 };
 
-const app = initializeApp(firebaseConfig);
+// Inisialisasi Firebase
+export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
