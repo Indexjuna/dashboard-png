@@ -6,19 +6,6 @@
   <title>Dashboard Data Staff</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-  <style>
-    .content-section{display:none;padding:20px}
-    .content-section.active{display:block}
-    .data-table{width:100%;border-collapse:collapse}
-    .data-table th,.data-table td{padding:8px;border:1px solid #eee}
-    .btn{padding:6px 10px;border-radius:6px;border:none;cursor:pointer}
-    .btn-edit{background:#3498db;color:white}
-    .btn-delete{background:#e74c3c;color:white}
-    .btn-primary{background:#2ecc71;color:#fff;padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
-    .admin-only{display:none}
-    body.admin-role .admin-only{display:inline-block}
-    .collapsed{width:80px}
-  </style>
 </head>
 <body>
   <div class="dashboard-container">
@@ -55,113 +42,41 @@
 
       <div class="content-area">
         <div id="home-content" class="content-section active">
-          <h2>Selamat datang</h2>
-          <p>Dashboard Home</p>
+          <h2>Selamat datang di Dashboard</h2>
+          <p>Setiap hari adalah kesempatan baru untuk berkembang 💪</p>
         </div>
-
-        <!-- Hatoribet -->
-        <div id="hatoribet-content" class="content-section">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <h2>Data Staff Hatoribet</h2>
-            <button id="addHatoribetBtn" class="btn-primary admin-only">Tambah Staff</button>
-          </div>
-          <table class="data-table" id="hatoribetTable"><thead><tr><th>Nama</th><th>Email</th><th>Gedung</th><th>Aksi</th></tr></thead><tbody></tbody></table>
-        </div>
-
-        <!-- Livitoto -->
-        <div id="livitoto-content" class="content-section">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <h2>Data Staff Livitoto</h2>
-            <button id="addLivitotoBtn" class="btn-primary admin-only">Tambah Staff</button>
-          </div>
-          <table class="data-table" id="livitotoTable"><thead><tr><th>Nama</th><th>Email</th><th>Gedung</th><th>Aksi</th></tr></thead><tbody></tbody></table>
-        </div>
-
-        <!-- HMD29 -->
-        <div id="hmd29-content" class="content-section">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <h2>Data Staff Hmd29</h2>
-            <button id="addHmd29Btn" class="btn-primary admin-only">Tambah Staff</button>
-          </div>
-          <table class="data-table" id="hmd29Table"><thead><tr><th>Nama</th><th>Email</th><th>Gedung</th><th>Aksi</th></tr></thead><tbody></tbody></table>
-        </div>
-
-        <!-- Peraturan -->
-        <div id="peraturan-content" class="content-section">
-          <h2>Peraturan</h2>
-          <button id="addPeraturanBtn" class="btn-primary admin-only">Tambah Peraturan</button>
-          <ul id="peraturanList"></ul>
-        </div>
-
-        <!-- Noted -->
-        <div id="noted-content" class="content-section">
-          <h2>Noted</h2>
-          <button id="addNotedBtn" class="btn-primary admin-only">Tambah Noted</button>
-          <ul id="notedList"></ul>
-        </div>
-
-        <!-- Users -->
-        <div id="users-content" class="content-section">
-          <h2>Manajemen Users</h2>
-          <table class="data-table" id="usersTable"><thead><tr><th>Email</th><th>Username</th><th>Role</th><th>Can Edit</th><th>Aksi</th></tr></thead><tbody></tbody></table>
-        </div>
-
       </div>
     </div>
   </div>
 
-  <!-- 🔥 Firebase + Role Script -->
+  <!-- Firebase dashboard logic -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { auth, db } from "./firebase.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyClRE2w0JeSj81gkccPC1au3hG8lQYbLzw",
-      authDomain: "dashboard-png.firebaseapp.com",
-      projectId: "dashboard-png",
-      storageBucket: "dashboard-png.appspot.com",
-      messagingSenderId: "121187805643",
-      appId: "1:121187805643:web:6c67dd587abbe09f782e4e",
-      measurementId: "G-N5MV2N5X33"
-    };
+    onAuthStateChanged(auth, async (user)=>{
+      if(!user){ location.href="index.html"; return; }
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    const logoutBtn = document.getElementById("logoutBtn");
-    const userEmail = document.getElementById("userEmail");
-    const userName = document.getElementById("userName");
-    const userAvatar = document.getElementById("userAvatar");
-
-    onAuthStateChanged(auth, async (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-        return;
-      }
       userEmail.textContent = user.email;
       userName.textContent = user.email.split('@')[0];
-      userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email.split('@')[0])}&background=0366d6&color=fff`;
+      userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email.split('@')[0])}`;
 
       const isAdmin = user.email === "admin@company.com";
-      document.body.classList.toggle("admin-role", isAdmin);
+      if(!isAdmin) document.querySelectorAll(".admin-only").forEach(btn=>btn.style.display='none');
 
       try {
-        const querySnapshot = await getDocs(collection(db, "staff"));
-        console.log("Data staff:", querySnapshot.size);
-      } catch (e) {
-        console.warn("Firestore belum aktif atau kosong:", e.message);
+        const snap = await getDocs(collection(db,"users"));
+        console.log("Data pengguna terambil:", snap.size);
+      } catch (err) {
+        console.warn("⚠️ Firestore belum aktif:", err.message);
       }
     });
 
-    logoutBtn.addEventListener("click", async () => {
+    logoutBtn.addEventListener("click", async ()=>{
       await signOut(auth);
-      window.location.href = "index.html";
+      location.href="index.html";
     });
   </script>
-
-  <!-- Script tampilan dashboard -->
-  <script src="script.js"></script>
 </body>
 </html>
