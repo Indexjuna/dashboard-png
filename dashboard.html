@@ -1,154 +1,116 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Dashboard Data Staff</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <style>
+    /* Minimal inline tweaks untuk layout (biar aman) */
+    .content-section{display:none;padding:20px}
+    .content-section.active{display:block}
+    .data-table{width:100%;border-collapse:collapse}
+    .data-table th,.data-table td{padding:8px;border:1px solid #eee}
+    .btn {padding:6px 10px;border-radius:6px;border:none;cursor:pointer}
+    .btn-edit{background:#3498db;color:white}
+    .btn-delete{background:#e74c3c;color:white}
+    .btn-primary{background:#2ecc71;color:#fff;padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
+    .admin-only{display:inline-block}
+    .collapsed{width:80px}
+  </style>
 </head>
 <body>
   <div class="dashboard-container">
-    <!-- Sidebar -->
     <div class="sidebar">
       <div class="logo">
         <h2><i class="fas fa-chart-line"></i> Dashboard</h2>
-        <p id="userEmail" style="font-size: 0.85em; color: #bbb; margin-top: 5px;">Memuat...</p>
+        <p id="userEmail" style="font-size:.85em;color:#bbb;margin-top:5px">Memuat...</p>
       </div>
       <ul class="menu">
-        <li class="menu-item active" data-content="home"><i class="fas fa-home"></i> <span>Dashboard Home</span></li>
-        <li class="menu-item" data-content="hatoribet"><i class="fas fa-users"></i> <span>Data Staff Hatoribet</span></li>
-        <li class="menu-item" data-content="livitoto"><i class="fas fa-user-tie"></i> <span>Data Staff Livitoto</span></li>
-        <li class="menu-item" data-content="hmd29"><i class="fas fa-user-friends"></i> <span>Data Staff Hmd29</span></li>
-        <li class="menu-item" data-content="peraturan"><i class="fas fa-book"></i> <span>Peraturan</span></li>
-        <li class="menu-item" data-content="noted"><i class="fas fa-sticky-note"></i> <span>Noted</span></li>
-        <li class="menu-item" data-content="users"><i class="fas fa-user-circle"></i> <span>Users</span></li>
+        <li class="menu-item active" data-content="home"><i class="fas fa-home"></i><span>Dashboard Home</span></li>
+        <li class="menu-item" data-content="hatoribet"><i class="fas fa-users"></i><span>Data Staff Hatoribet</span></li>
+        <li class="menu-item" data-content="livitoto"><i class="fas fa-user-tie"></i><span>Data Staff Livitoto</span></li>
+        <li class="menu-item" data-content="hmd29"><i class="fas fa-user-friends"></i><span>Data Staff Hmd29</span></li>
+        <li class="menu-item" data-content="peraturan"><i class="fas fa-book"></i><span>Peraturan</span></li>
+        <li class="menu-item" data-content="noted"><i class="fas fa-sticky-note"></i><span>Noted</span></li>
+        <li class="menu-item" data-content="users"><i class="fas fa-user-circle"></i><span>Users</span></li>
       </ul>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content">
       <header class="header">
         <div class="header-left">
-          <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+          <button id="menuToggle" class="btn"><i class="fas fa-bars"></i></button>
           <h1 id="pageTitle">Dashboard Home</h1>
         </div>
         <div class="header-right">
           <div class="user-profile">
-            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=0366d6&color=fff" alt="User">
-            <span id="userName">Memuat...</span>
-            <button id="logoutBtn" class="btn-logout" style="margin-left: 10px; background:#e74c3c; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">
-              <i class="fas fa-sign-out-alt"></i> Logout
-            </button>
+            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=0366d6&color=fff" style="width:40px;height:40px;border-radius:50%;" alt="User">
+            <span id="userName" style="margin-left:8px">Memuat...</span>
+            <button id="logoutBtn" class="btn" style="margin-left:10px;background:#e74c3c;color:white;"><i class="fas fa-sign-out-alt"></i> Logout</button>
           </div>
         </div>
       </header>
 
       <div class="content-area">
         <div id="home-content" class="content-section active">
-          <div class="welcome-section">
-            <h2>Selamat Datang di Dashboard</h2>
-            <p>
-              Setiap hari adalah kesempatan baru untuk menjadi versi terbaik dari diri kita.<br><br>
-              Jangan fokus pada lelahnya, tapi nikmati prosesnya. Karena dari setiap tantangan, kita belajar menjadi lebih kuat, lebih tangguh, dan lebih berpengalaman.<br><br>
-              Mari buktikan bahwa tim kita bukan hanya bekerja, tapi juga berkarya dan berprestasi dengan penuh semangat!
-            </p>
-          </div>
+          <h2>Selamat datang</h2>
+          <p>Dashboard Home</p>
         </div>
 
-        <!-- Seksi lain bisa kamu isi seperti sebelumnya -->
+        <!-- Hatoribet -->
         <div id="hatoribet-content" class="content-section">
-          <h2>Data Staff Hatoribet</h2>
-          <p>Konten Hatoribet...</p>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h2>Data Staff Hatoribet</h2>
+            <button id="addHatoribetBtn" class="btn-primary admin-only">Tambah Staff</button>
+          </div>
+          <table class="data-table" id="hatoribetTable"><thead><tr><th>Nama</th><th>Email</th><th>Gedung</th><th>Aksi</th></tr></thead><tbody></tbody></table>
         </div>
+
+        <!-- Livitoto -->
         <div id="livitoto-content" class="content-section">
-          <h2>Data Staff Livitoto</h2>
-          <p>Konten Livitoto...</p>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h2>Data Staff Livitoto</h2>
+            <button id="addLivitotoBtn" class="btn-primary admin-only">Tambah Staff</button>
+          </div>
+          <table class="data-table" id="livitotoTable"><thead><tr><th>Nama</th><th>Email</th><th>Gedung</th><th>Aksi</th></tr></thead><tbody></tbody></table>
         </div>
+
+        <!-- HMD29 -->
         <div id="hmd29-content" class="content-section">
-          <h2>Data Staff Hmd29</h2>
-          <p>Konten HMD29...</p>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <h2>Data Staff Hmd29</h2>
+            <button id="addHmd29Btn" class="btn-primary admin-only">Tambah Staff</button>
+          </div>
+          <table class="data-table" id="hmd29Table"><thead><tr><th>Nama</th><th>Email</th><th>Gedung</th><th>Aksi</th></tr></thead><tbody></tbody></table>
         </div>
+
+        <!-- Peraturan -->
         <div id="peraturan-content" class="content-section">
-          <h2>Peraturan Perusahaan</h2>
+          <h2>Peraturan</h2>
+          <button id="addPeraturanBtn" class="btn-primary admin-only">Tambah Peraturan</button>
+          <ul id="peraturanList"></ul>
         </div>
+
+        <!-- Noted -->
         <div id="noted-content" class="content-section">
-          <h2>Catatan / Noted</h2>
+          <h2>Noted</h2>
+          <button id="addNotedBtn" class="btn-primary admin-only">Tambah Noted</button>
+          <ul id="notedList"></ul>
         </div>
+
+        <!-- Users -->
         <div id="users-content" class="content-section">
-          <h2>Manajemen User</h2>
+          <h2>Manajemen Users</h2>
+          <table class="data-table" id="usersTable"><thead><tr><th>Email</th><th>Username</th><th>Role</th><th>Can Edit</th><th>Aksi</th></tr></thead><tbody></tbody></table>
         </div>
+
       </div>
     </div>
   </div>
 
-  <!-- ✅ Firebase Auth + Dashboard Script -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyClRE2w0JeSj81gkccPC1au3hG8lQYbLzw",
-      authDomain: "dashboard-png.firebaseapp.com",
-      projectId: "dashboard-png",
-      storageBucket: "dashboard-png.firebasestorage.app",
-      messagingSenderId: "121187805643",
-      appId: "1:121187805643:web:6c67dd587abbe09f782e4e",
-      measurementId: "G-N5MV2N5X33"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    // 🔐 Cek status login user
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = "index.html";
-      } else {
-        document.getElementById("userEmail").textContent = user.email;
-        document.getElementById("userName").textContent = user.email.split('@')[0];
-        document.getElementById("userAvatar").src =
-          `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email.split('@')[0])}&background=0366d6&color=fff`;
-
-        initDashboardEvents(); // aktifkan klik menu setelah user terdeteksi
-      }
-    });
-
-    // 🚪 Tombol Logout
-    document.getElementById("logoutBtn").addEventListener("click", async () => {
-      await signOut(auth);
-      window.location.href = "index.html";
-    });
-
-    // 🧭 Fungsi navigasi sidebar
-    function initDashboardEvents() {
-      const menuItems = document.querySelectorAll(".menu-item");
-      const sections = document.querySelectorAll(".content-section");
-      const pageTitle = document.getElementById("pageTitle");
-      const sidebar = document.querySelector(".sidebar");
-      const menuToggle = document.getElementById("menuToggle");
-
-      menuItems.forEach(item => {
-        item.addEventListener("click", () => {
-          menuItems.forEach(i => i.classList.remove("active"));
-          item.classList.add("active");
-
-          const target = item.dataset.content;
-          sections.forEach(sec => sec.classList.remove("active"));
-          document.getElementById(`${target}-content`).classList.add("active");
-
-          pageTitle.textContent = item.querySelector("span").textContent;
-        });
-      });
-
-      if (menuToggle) {
-        menuToggle.addEventListener("click", () => {
-          sidebar.classList.toggle("collapsed");
-        });
-      }
-    }
-  </script>
-
-  <script src="script.js"></script>
+  <!-- Modal sederhana via prompt / confirm (bikin cepat) -->
+  <script type="module" src="script.js"></script>
 </body>
 </html>
