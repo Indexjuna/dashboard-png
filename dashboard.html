@@ -1,41 +1,44 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard Data Staff</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
+
 <body>
   <div class="dashboard-container">
+    <!-- Sidebar -->
     <div class="sidebar">
       <div class="logo">
         <h2><i class="fas fa-chart-line"></i> Dashboard</h2>
-        <p id="userEmail" style="font-size:.85em;color:#bbb;margin-top:5px">Memuat...</p>
+        <p id="userEmail" style="font-size: 0.85em; color: #bbb; margin-top: 5px;">Memuat...</p>
       </div>
       <ul class="menu">
-        <li class="menu-item active" data-content="home"><i class="fas fa-home"></i><span>Dashboard Home</span></li>
-        <li class="menu-item" data-content="hatoribet"><i class="fas fa-users"></i><span>Data Staff Hatoribet</span></li>
-        <li class="menu-item" data-content="livitoto"><i class="fas fa-user-tie"></i><span>Data Staff Livitoto</span></li>
-        <li class="menu-item" data-content="hmd29"><i class="fas fa-user-friends"></i><span>Data Staff Hmd29</span></li>
-        <li class="menu-item" data-content="peraturan"><i class="fas fa-book"></i><span>Peraturan</span></li>
-        <li class="menu-item" data-content="noted"><i class="fas fa-sticky-note"></i><span>Noted</span></li>
-        <li class="menu-item" data-content="users"><i class="fas fa-user-circle"></i><span>Users</span></li>
+        <li class="menu-item active" data-content="home"><i class="fas fa-home"></i> <span>Dashboard Home</span></li>
+        <li class="menu-item" data-content="hatoribet"><i class="fas fa-users"></i> <span>Data Staff Hatoribet</span></li>
+        <li class="menu-item" data-content="livitoto"><i class="fas fa-user-tie"></i> <span>Data Staff Livitoto</span></li>
+        <li class="menu-item" data-content="hmd29"><i class="fas fa-user-friends"></i> <span>Data Staff Hmd29</span></li>
+        <li class="menu-item" data-content="peraturan"><i class="fas fa-book"></i> <span>Peraturan</span></li>
+        <li class="menu-item" data-content="noted"><i class="fas fa-sticky-note"></i> <span>Noted</span></li>
+        <li class="menu-item" data-content="users"><i class="fas fa-user-circle"></i> <span>Users</span></li>
       </ul>
     </div>
 
+    <!-- Main Content -->
     <div class="main-content">
       <header class="header">
         <div class="header-left">
-          <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+          <button id="menuToggle" class="btn"><i class="fas fa-bars"></i></button>
           <h1 id="pageTitle">Dashboard Home</h1>
         </div>
         <div class="header-right">
           <div class="user-profile">
             <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=0366d6&color=fff" alt="User">
             <span id="userName">Memuat...</span>
-            <button id="logoutBtn" class="btn-logout" style="margin-left:10px;background:#e74c3c;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">
+            <button id="logoutBtn" class="btn" style="margin-left: 10px; background:#e74c3c; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">
               <i class="fas fa-sign-out-alt"></i> Logout
             </button>
           </div>
@@ -44,20 +47,44 @@
 
       <div class="content-area">
         <div id="home-content" class="content-section active">
-          <h2>Selamat Datang di Dashboard</h2>
-          <p>Dashboard Home</p>
+          <div class="welcome-section">
+            <h2>Selamat Datang di Dashboard</h2>
+            <p>
+              Setiap hari adalah kesempatan baru untuk menjadi versi terbaik dari diri kita.<br><br>
+              Jangan fokus pada lelahnya, tapi nikmati prosesnya. Karena dari setiap tantangan, kita belajar menjadi lebih kuat, lebih tangguh, dan lebih berpengalaman.<br><br>
+              Mari buktikan bahwa tim kita bukan hanya bekerja, tapi juga berkarya dan berprestasi dengan penuh semangat!
+            </p>
+          </div>
         </div>
 
-        <div id="hatoribet-content" class="content-section"><h2>Data Staff Hatoribet</h2></div>
-        <div id="livitoto-content" class="content-section"><h2>Data Staff Livitoto</h2></div>
-        <div id="hmd29-content" class="content-section"><h2>Data Staff Hmd29</h2></div>
-        <div id="peraturan-content" class="content-section"><h2>Peraturan</h2></div>
-        <div id="noted-content" class="content-section"><h2>Noted</h2></div>
-        <div id="users-content" class="content-section"><h2>Manajemen User</h2></div>
+        <!-- Section lainnya -->
+        <div id="hatoribet-content" class="content-section">
+          <h2>Data Staff Hatoribet</h2>
+          <p>Konten Hatoribet...</p>
+        </div>
+        <div id="livitoto-content" class="content-section">
+          <h2>Data Staff Livitoto</h2>
+          <p>Konten Livitoto...</p>
+        </div>
+        <div id="hmd29-content" class="content-section">
+          <h2>Data Staff Hmd29</h2>
+          <p>Konten HMD29...</p>
+        </div>
+        <div id="peraturan-content" class="content-section">
+          <h2>Peraturan Perusahaan</h2>
+        </div>
+        <div id="noted-content" class="content-section">
+          <h2>Catatan / Noted</h2>
+        </div>
+        <div id="users-content" class="content-section">
+          <h2>Manajemen User</h2>
+        </div>
       </div>
     </div>
   </div>
 
+  <!-- ✅ Firebase Auth + Dashboard Logic -->
+  <script type="module" src="login.js"></script>
   <script type="module" src="script.js"></script>
 </body>
 </html>
