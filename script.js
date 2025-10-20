@@ -1,8 +1,4 @@
 // ==================== 🔥 script.js — Dashboard utama ====================
-// Terhubung ke Firebase Auth + Firestore
-// Pastikan dipanggil di dashboard.html dengan:
-// <script type="module" src="script.js"></script>
-
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import {
   getAuth,
@@ -13,7 +9,6 @@ import {
   getFirestore,
   collection,
   query,
-  where,
   getDocs,
   addDoc,
   updateDoc,
@@ -39,230 +34,113 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // ==================== 🔐 State & Elemen ====================
-let currentUser = null;
 let currentUserDoc = null;
-let isAdminOrCanEdit = false;
-
-// UI Elements
-const menuItems = document.querySelectorAll('.menu-item');
-const contentSections = document.querySelectorAll('.content-section');
-const menuToggle = document.getElementById('menuToggle');
-const sidebar = document.querySelector('.sidebar');
-const pageTitle = document.getElementById('pageTitle');
-
-const hatoribetTableBody = document.getElementById('hatoribetTableBody');
-const livitotoTableBody = document.getElementById('livitotoTableBody');
-const hmd29TableBody = document.getElementById('hmd29TableBody');
-
-const staffHatoribetCount = document.getElementById('staffHatoribetCount');
-const staffLivitotoCount = document.getElementById('staffLivitotoCount');
-const staffHmd29Count = document.getElementById('staffHmd29Count');
-
-const modal = document.getElementById('staffModal');
-const staffForm = document.getElementById('staffForm');
-const cancelBtn = document.getElementById('cancelBtn');
-const modalTitle = document.getElementById('modalTitle');
-const staffIdInput = document.getElementById('staffId');
-const editModeInput = document.getElementById('editMode');
-const activityList = document.getElementById('activityList');
+let canEdit = false;
 
 // ==================== 👤 Auth Listener ====================
 onAuthStateChanged(auth, async (user) => {
-  if (!user) {
-    window.location.href = 'index.html';
-    return;
-  }
+  if (!user) return (window.location.href = "index.html");
 
-  currentUser = user;
   try {
-    const userRef = doc(db, 'users', user.uid);
-    const userSnap = await getDoc(userRef);
+    const userRef = doc(db, "users", user.uid);
+    const snap = await getDoc(userRef);
+    if (!snap.exists()) return alert("User tidak ditemukan di database!");
 
-    if (userSnap.exists()) {
-      currentUserDoc = userSnap.data();
+    currentUserDoc = snap.data();
+    canEdit = currentUserDoc.role === "admin" || currentUserDoc.canEdit === true;
 
-      // ✅ pastikan admin punya hak edit
-      if (currentUserDoc.email === "admin@company.com") {
-        currentUserDoc.role = "admin";
-        currentUserDoc.canEdit = true;
-      }
+    // Update UI user
+    document.getElementById("userEmail").textContent = user.email;
+    document.getElementById("userName").textContent =
+      currentUserDoc.username || user.email.split("@")[0];
 
-    } else {
-      // buat doc baru kalau belum ada
-      const defaultRole = user.email === 'admin@company.com' ? 'admin' : 'staff';
-      await addDoc(collection(db, 'users'), {
-        uid: user.uid,
-        email: user.email,
-        username: user.email.split('@')[0],
-        role: defaultRole,
-        canEdit: defaultRole === 'admin',
-        createdAt: serverTimestamp()
-      });
-      currentUserDoc = { role: defaultRole, canEdit: defaultRole === 'admin' };
-    }
+    document.getElementById(
+      "userAvatar"
+    ).src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+      currentUserDoc.username || "User"
+    )}&background=0366d6&color=fff`;
 
-    // ✅ baru set izin edit
-    isAdminOrCanEdit =
-      currentUserDoc.role === "admin" || currentUserDoc.canEdit === true;
-
-    // update UI profile
-    const avatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUserDoc.username || user.email.split('@')[0])}&background=0366d6&color=fff`;
-    document.querySelector('.user-profile img').src = avatar;
-    document.querySelector('.user-profile span').textContent =
-      currentUserDoc.username || user.email.split('@')[0];
-    document.getElementById('userEmail').textContent = user.email;
-
-    // kasih class khusus admin
-    if (isAdminOrCanEdit) {
-      document.body.classList.add("admin-role");
-    } else {
-      document.body.classList.remove("admin-role");
-    }
-
-    // Inisialisasi dashboard
+    // Load data
     initDashboardEvents();
-    await loadAllStaff();
-    await loadActivities();
+    loadAllStaff();
     applyPermissionsUI();
-
-    console.log("✅ Login sebagai:", currentUserDoc.role, "| canEdit:", currentUserDoc.canEdit);
-
   } catch (err) {
-    console.error("❌ Gagal ambil data user:", err.message);
+    console.error("Gagal ambil user:", err.message);
   }
 });
 
 // ==================== 🚪 Logout ====================
 async function logout() {
   await signOut(auth);
-  window.location.href = 'index.html';
+  window.location.href = "index.html";
 }
+document.getElementById("logoutBtn")?.addEventListener("click", logout);
 
-// ==================== 🧭 Navigasi & UI ====================
+// ==================== 🧭 Navigasi ====================
 function initDashboardEvents() {
-  menuItems.forEach(item => {
-    item.addEventListener('click', () => {
-      menuItems.forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
+  document.querySelectorAll(".menu-item").forEach((item) => {
+    item.addEventListener("click", () => {
+      document
+        .querySelectorAll(".menu-item")
+        .forEach((i) => i.classList.remove("active"));
+      item.classList.add("active");
 
       const target = item.dataset.content;
-      contentSections.forEach(sec => sec.classList.remove('active'));
-      document.getElementById(`${target}-content`)?.classList.add('active');
-      pageTitle.textContent = item.querySelector('span').textContent;
+      document
+        .querySelectorAll(".content-section")
+        .forEach((sec) => sec.classList.remove("active"));
+      document.getElementById(`${target}-content`)?.classList.add("active");
 
-      localStorage.setItem('activeMenu', target);
+      document.getElementById("pageTitle").textContent =
+        item.querySelector("span").textContent;
     });
   });
 
-  menuToggle?.addEventListener('click', () => sidebar.classList.toggle('collapsed'));
-  document.getElementById('logoutBtn')?.addEventListener('click', logout);
-
-  // restore menu terakhir
-  const saved = localStorage.getItem('activeMenu');
-  if (saved) document.querySelector(`.menu-item[data-content="${saved}"]`)?.click();
+  document
+    .getElementById("menuToggle")
+    ?.addEventListener("click", () =>
+      document.querySelector(".sidebar").classList.toggle("collapsed")
+    );
 }
 
 // ==================== 🔒 Permissions ====================
 function applyPermissionsUI() {
-  document.querySelectorAll('.admin-only').forEach(el => {
-    el.style.display = isAdminOrCanEdit ? '' : 'none';
+  const editableBtns = document.querySelectorAll(".btn-edit, .btn-delete");
+  editableBtns.forEach((btn) => {
+    btn.style.display = canEdit ? "inline-block" : "none";
   });
-  document.querySelectorAll('.btn-edit, .btn-delete').forEach(btn => {
-    btn.style.display = isAdminOrCanEdit ? '' : 'none';
+
+  const adminSections = document.querySelectorAll(".admin-only");
+  adminSections.forEach((sec) => {
+    sec.style.display = canEdit ? "block" : "none";
   });
 }
 
-// ==================== 👥 Firestore: CRUD Staff ====================
-async function addStaffToFirestore(data) {
-  data.createdAt = serverTimestamp();
-  return (await addDoc(collection(db, 'staff'), data)).id;
-}
-
-async function updateStaffInFirestore(id, data) {
-  await updateDoc(doc(db, 'staff', id), { ...data, updatedAt: serverTimestamp() });
-}
-
-async function deleteStaffFromFirestore(id) {
-  await deleteDoc(doc(db, 'staff', id));
-}
-
-// ==================== 📋 Load Staff ====================
+// ==================== 📋 Staff CRUD ====================
 async function loadAllStaff() {
   try {
-    const snap = await getDocs(query(collection(db, 'staff')));
-    const staff = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    const snap = await getDocs(query(collection(db, "staff")));
+    const staff = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const tbody = document.getElementById("hatoribetTableBody");
+    if (!tbody) return;
 
-    const hatoribet = staff.filter(s => s.department === 'hatoribet');
-    const livitoto = staff.filter(s => s.department === 'livitoto');
-    const hmd29 = staff.filter(s => s.department === 'hmd29');
-
-    renderStaffTable(hatoribetTableBody, hatoribet);
-    renderStaffTable(livitotoTableBody, livitoto);
-    renderStaffTable(hmd29TableBody, hmd29);
-
-    staffHatoribetCount.textContent = hatoribet.length;
-    staffLivitotoCount.textContent = livitoto.length;
-    staffHmd29Count.textContent = hmd29.length;
-
-    const total = hatoribet.length + livitoto.length + hmd29.length;
-    document.querySelector('.stat-number').textContent = total;
-
-    applyPermissionsUI();
+    tbody.innerHTML = "";
+    staff.forEach((item) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${item.name || ""}</td>
+        <td>${item.inisial || ""}</td>
+        <td>${item.department || ""}</td>
+        <td>${item.email || ""}</td>
+        <td>
+          <button class="btn btn-detail">Detail</button>
+          <button class="btn btn-edit" style="display:${canEdit ? "inline" : "none"}">Edit</button>
+          <button class="btn btn-delete" style="display:${canEdit ? "inline" : "none"}">Hapus</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
   } catch (err) {
-    console.error('❌ Gagal load staff:', err.message);
-  }
-}
-
-// ==================== 🧾 Render Tabel ====================
-function renderStaffTable(tbody, list) {
-  if (!tbody) return;
-  tbody.innerHTML = '';
-  list.forEach(item => {
-    const tr = document.createElement('tr');
-    const cells = [
-      item.name, item.inisial, item.tanggalJoin, item.idAdmin,
-      item.gmail || item.email, item.bank, item.noRekGaji,
-      item.namaRekGaji, item.tanggalLahir, item.gedung,
-      item.noKamar, item.masaKerja
-    ];
-    cells.forEach(text => {
-      const td = document.createElement('td');
-      td.textContent = text || '';
-      tr.appendChild(td);
-    });
-
-    const aksi = document.createElement('td');
-    aksi.innerHTML = `
-      <button class="btn btn-detail">Detail</button>
-      <button class="btn btn-edit" style="margin-left:6px;">Edit</button>
-      <button class="btn btn-delete" style="margin-left:6px;">Hapus</button>
-    `;
-
-    aksi.querySelector('.btn-delete').addEventListener('click', async () => {
-      if (!isAdminOrCanEdit) return alert('❌ Tidak diizinkan.');
-      if (!confirm('Hapus data staff ini?')) return;
-      await deleteStaffFromFirestore(item.id);
-      await loadAllStaff();
-      alert('✅ Data dihapus.');
-    });
-
-    tbody.appendChild(tr);
-    tr.appendChild(aksi);
-  });
-}
-
-// ==================== 🗓️ Activities ====================
-async function loadActivities() {
-  try {
-    const snap = await getDocs(query(collection(db, 'activities')));
-    const items = snap.docs.map(d => d.data());
-    if (!activityList) return;
-    activityList.innerHTML = items.slice(0, 10).map(it => `
-      <div class="activity-item">
-        ${it.text || JSON.stringify(it)} (${it.createdAt ? new Date(it.createdAt.seconds * 1000).toLocaleString() : ''})
-      </div>
-    `).join('');
-  } catch {
-    if (activityList) activityList.innerHTML = '<p>Tidak ada aktivitas.</p>';
+    console.error("Gagal memuat data staff:", err.message);
   }
 }
