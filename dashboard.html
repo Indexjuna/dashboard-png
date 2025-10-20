@@ -7,16 +7,16 @@
   <link rel="stylesheet" href="style.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
-    /* Minimal inline tweaks untuk layout (biar aman) */
     .content-section{display:none;padding:20px}
     .content-section.active{display:block}
     .data-table{width:100%;border-collapse:collapse}
     .data-table th,.data-table td{padding:8px;border:1px solid #eee}
-    .btn {padding:6px 10px;border-radius:6px;border:none;cursor:pointer}
+    .btn{padding:6px 10px;border-radius:6px;border:none;cursor:pointer}
     .btn-edit{background:#3498db;color:white}
     .btn-delete{background:#e74c3c;color:white}
     .btn-primary{background:#2ecc71;color:#fff;padding:8px 12px;border-radius:6px;border:none;cursor:pointer}
-    .admin-only{display:inline-block}
+    .admin-only{display:none}
+    body.admin-role .admin-only{display:inline-block}
     .collapsed{width:80px}
   </style>
 </head>
@@ -110,7 +110,58 @@
     </div>
   </div>
 
-  <!-- Modal sederhana via prompt / confirm (bikin cepat) -->
-  <script type="module" src="script.js"></script>
+  <!-- 🔥 Firebase + Role Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyClRE2w0JeSj81gkccPC1au3hG8lQYbLzw",
+      authDomain: "dashboard-png.firebaseapp.com",
+      projectId: "dashboard-png",
+      storageBucket: "dashboard-png.appspot.com",
+      messagingSenderId: "121187805643",
+      appId: "1:121187805643:web:6c67dd587abbe09f782e4e",
+      measurementId: "G-N5MV2N5X33"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    const userEmail = document.getElementById("userEmail");
+    const userName = document.getElementById("userName");
+    const userAvatar = document.getElementById("userAvatar");
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "index.html";
+        return;
+      }
+      userEmail.textContent = user.email;
+      userName.textContent = user.email.split('@')[0];
+      userAvatar.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email.split('@')[0])}&background=0366d6&color=fff`;
+
+      const isAdmin = user.email === "admin@company.com";
+      document.body.classList.toggle("admin-role", isAdmin);
+
+      try {
+        const querySnapshot = await getDocs(collection(db, "staff"));
+        console.log("Data staff:", querySnapshot.size);
+      } catch (e) {
+        console.warn("Firestore belum aktif atau kosong:", e.message);
+      }
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
+    });
+  </script>
+
+  <!-- Script tampilan dashboard -->
+  <script src="script.js"></script>
 </body>
 </html>
