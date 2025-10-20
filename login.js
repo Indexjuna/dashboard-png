@@ -1,4 +1,4 @@
-// login.js — untuk halaman index.html
+// login.js — untuk halaman index.html (Login & Register)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
 import {
   getAuth,
@@ -11,6 +11,7 @@ import {
   doc,
   setDoc,
   serverTimestamp,
+  getDoc,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // 🔧 Firebase config (pakai project lama)
@@ -28,30 +29,20 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// 🧠 Form login/register
+// ===================== 🔥 FORM HANDLER =====================
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
-const toggleLogin = document.getElementById("toggleLogin");
-const toggleRegister = document.getElementById("toggleRegister");
-
-// 🔁 Ganti antara form login & register
-if (toggleRegister) toggleRegister.addEventListener("click", () => {
-  loginForm.style.display = "none";
-  registerForm.style.display = "block";
-});
-if (toggleLogin) toggleLogin.addEventListener("click", () => {
-  registerForm.style.display = "none";
-  loginForm.style.display = "block";
-});
 
 // 🚪 LOGIN
 if (loginForm) {
   loginForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+    const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+    const password = document.getElementById("loginPassword").value;
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      console.log("✅ Login sukses:", email);
       window.location.href = "dashboard.html";
     } catch (err) {
       alert("Login gagal: " + err.message);
@@ -63,35 +54,46 @@ if (loginForm) {
 if (registerForm) {
   registerForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    const email = e.target.email.value;
-    const password = e.target.password.value;
+    const name = document.getElementById("registerName").value.trim();
+    const email = document.getElementById("registerEmail").value.trim().toLowerCase();
+    const password = document.getElementById("registerPassword").value;
+    const confirm = document.getElementById("registerConfirmPassword").value;
+
+    if (password !== confirm) return alert("Konfirmasi password tidak cocok!");
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // simpan user ke koleksi "users"
-      await setDoc(doc(db, "users", user.uid), {
-        uid: user.uid,
-        email: user.email,
-        username: user.email.split("@")[0],
-        role: "staff",
-        canEdit: false,
-        createdAt: serverTimestamp(),
-      });
+      // cek apakah sudah ada doc user (hindari dobel)
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+      if (!userSnap.exists()) {
+        const isAdmin = email === "admin@company.com";
+        await setDoc(userRef, {
+          uid: user.uid,
+          email: user.email,
+          username: name || user.email.split("@")[0],
+          role: isAdmin ? "admin" : "staff",
+          canEdit: isAdmin,
+          createdAt: serverTimestamp(),
+        });
+      }
 
-      alert("Registrasi berhasil! Silakan login.");
+      alert("✅ Registrasi berhasil! Silakan login.");
       registerForm.reset();
-      registerForm.style.display = "none";
-      loginForm.style.display = "block";
+      window.location.reload(); // balik ke form login
     } catch (err) {
       alert("Gagal daftar: " + err.message);
     }
   });
 }
 
-// 🔄 Auto redirect jika user sudah login
+// ===================== 🔁 CEK LOGIN =====================
+// kalau user sudah login & saat ini di index.html, arahkan ke dashboard
 onAuthStateChanged(auth, (user) => {
-  if (user) {
+  if (user && !window.location.href.includes("dashboard.html")) {
+    console.log("🔁 Sudah login, langsung ke dashboard:", user.email);
     window.location.href = "dashboard.html";
   }
 });
