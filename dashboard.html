@@ -56,17 +56,37 @@
           </div>
         </div>
 
-        <!-- (konten lain tetap sama seperti file kamu sebelumnya) -->
+        <!-- Seksi lain bisa kamu isi seperti sebelumnya -->
+        <div id="hatoribet-content" class="content-section">
+          <h2>Data Staff Hatoribet</h2>
+          <p>Konten Hatoribet...</p>
+        </div>
+        <div id="livitoto-content" class="content-section">
+          <h2>Data Staff Livitoto</h2>
+          <p>Konten Livitoto...</p>
+        </div>
+        <div id="hmd29-content" class="content-section">
+          <h2>Data Staff Hmd29</h2>
+          <p>Konten HMD29...</p>
+        </div>
+        <div id="peraturan-content" class="content-section">
+          <h2>Peraturan Perusahaan</h2>
+        </div>
+        <div id="noted-content" class="content-section">
+          <h2>Catatan / Noted</h2>
+        </div>
+        <div id="users-content" class="content-section">
+          <h2>Manajemen User</h2>
+        </div>
       </div>
     </div>
   </div>
 
-  <!-- FIREBASE LOGIN CHECK -->
+  <!-- ✅ Firebase Auth + Dashboard Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    // Firebase Config kamu
     const firebaseConfig = {
       apiKey: "AIzaSyClRE2w0JeSj81gkccPC1au3hG8lQYbLzw",
       authDomain: "dashboard-png.firebaseapp.com",
@@ -77,32 +97,58 @@
       measurementId: "G-N5MV2N5X33"
     };
 
-    // Inisialisasi Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
     // 🔐 Cek status login user
     onAuthStateChanged(auth, (user) => {
       if (!user) {
-        // kalau belum login, arahkan ke halaman login (index.html)
         window.location.href = "index.html";
       } else {
-        console.log("✅ Login terdeteksi:", user.email);
         document.getElementById("userEmail").textContent = user.email;
         document.getElementById("userName").textContent = user.email.split('@')[0];
-        document.getElementById("userAvatar").src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email.split('@')[0])}&background=0366d6&color=fff`;
+        document.getElementById("userAvatar").src =
+          `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email.split('@')[0])}&background=0366d6&color=fff`;
+
+        initDashboardEvents(); // aktifkan klik menu setelah user terdeteksi
       }
     });
 
     // 🚪 Tombol Logout
     document.getElementById("logoutBtn").addEventListener("click", async () => {
       await signOut(auth);
-      // setelah logout, balik ke halaman login (index.html)
       window.location.href = "index.html";
     });
+
+    // 🧭 Fungsi navigasi sidebar
+    function initDashboardEvents() {
+      const menuItems = document.querySelectorAll(".menu-item");
+      const sections = document.querySelectorAll(".content-section");
+      const pageTitle = document.getElementById("pageTitle");
+      const sidebar = document.querySelector(".sidebar");
+      const menuToggle = document.getElementById("menuToggle");
+
+      menuItems.forEach(item => {
+        item.addEventListener("click", () => {
+          menuItems.forEach(i => i.classList.remove("active"));
+          item.classList.add("active");
+
+          const target = item.dataset.content;
+          sections.forEach(sec => sec.classList.remove("active"));
+          document.getElementById(`${target}-content`).classList.add("active");
+
+          pageTitle.textContent = item.querySelector("span").textContent;
+        });
+      });
+
+      if (menuToggle) {
+        menuToggle.addEventListener("click", () => {
+          sidebar.classList.toggle("collapsed");
+        });
+      }
+    }
   </script>
 
-  <!-- File JS tambahan -->
   <script src="script.js"></script>
 </body>
 </html>
