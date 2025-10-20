@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Dashboard Data Staff</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -12,29 +12,49 @@
     <div class="sidebar">
       <div class="logo">
         <h2><i class="fas fa-chart-line"></i> Dashboard</h2>
-        <p id="userEmail">Memuat...</p>
+        <p id="userEmail" style="font-size:.85em;color:#bbb;margin-top:5px">Memuat...</p>
       </div>
       <ul class="menu">
-        <li class="menu-item active" data-content="home"><i class="fas fa-home"></i> Dashboard</li>
-        <li class="menu-item" data-content="hatoribet"><i class="fas fa-users"></i> Hatoribet</li>
-        <li class="menu-item" data-content="livitoto"><i class="fas fa-user-tie"></i> Livitoto</li>
-        <li class="menu-item" data-content="hmd29"><i class="fas fa-user-friends"></i> HMD29</li>
-        <li class="menu-item" data-content="users"><i class="fas fa-user-circle"></i> Users</li>
+        <li class="menu-item active" data-content="home"><i class="fas fa-home"></i><span>Dashboard Home</span></li>
+        <li class="menu-item" data-content="hatoribet"><i class="fas fa-users"></i><span>Data Staff Hatoribet</span></li>
+        <li class="menu-item" data-content="livitoto"><i class="fas fa-user-tie"></i><span>Data Staff Livitoto</span></li>
+        <li class="menu-item" data-content="hmd29"><i class="fas fa-user-friends"></i><span>Data Staff Hmd29</span></li>
+        <li class="menu-item" data-content="peraturan"><i class="fas fa-book"></i><span>Peraturan</span></li>
+        <li class="menu-item" data-content="noted"><i class="fas fa-sticky-note"></i><span>Noted</span></li>
+        <li class="menu-item" data-content="users"><i class="fas fa-user-circle"></i><span>Users</span></li>
       </ul>
     </div>
 
     <div class="main-content">
       <header class="header">
         <div class="header-left">
-          <button id="menuToggle" class="btn"><i class="fas fa-bars"></i></button>
+          <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
           <h1 id="pageTitle">Dashboard Home</h1>
         </div>
         <div class="header-right">
-          <span id="userName"></span>
-          <button id="logoutBtn" class="btn" style="background:#e74c3c;color:white"><i class="fas fa-sign-out-alt"></i> Logout</button>
+          <div class="user-profile">
+            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=0366d6&color=fff" alt="User">
+            <span id="userName">Memuat...</span>
+            <button id="logoutBtn" class="btn-logout" style="margin-left:10px;background:#e74c3c;color:white;border:none;padding:6px 12px;border-radius:6px;cursor:pointer;">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </div>
         </div>
       </header>
-      <div class="content-area" id="contentArea">Memuat...</div>
+
+      <div class="content-area">
+        <div id="home-content" class="content-section active">
+          <h2>Selamat Datang di Dashboard</h2>
+          <p>Dashboard Home</p>
+        </div>
+
+        <div id="hatoribet-content" class="content-section"><h2>Data Staff Hatoribet</h2></div>
+        <div id="livitoto-content" class="content-section"><h2>Data Staff Livitoto</h2></div>
+        <div id="hmd29-content" class="content-section"><h2>Data Staff Hmd29</h2></div>
+        <div id="peraturan-content" class="content-section"><h2>Peraturan</h2></div>
+        <div id="noted-content" class="content-section"><h2>Noted</h2></div>
+        <div id="users-content" class="content-section"><h2>Manajemen User</h2></div>
+      </div>
     </div>
   </div>
 
