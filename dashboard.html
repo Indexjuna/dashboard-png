@@ -1,132 +1,104 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Data Staff</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Data Staff</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Sidebar Menu -->
-        <div class="sidebar">
-            <div class="logo">
-                <h2><i class="fas fa-chart-line"></i> Dashboard</h2>
-            </div>
-            <ul class="menu">
-                <li class="menu-item active" data-content="home">
-                    <i class="fas fa-home"></i>
-                    <span>Dashboard Home</span>
-                </li>
-                <li class="menu-item" data-content="hatoribet">
-                    <i class="fas fa-users"></i>
-                    <span>Data Staff Hatoribet</span>
-                </li>
-                <li class="menu-item" data-content="livitoto">
-                    <i class="fas fa-user-tie"></i>
-                    <span>Data Staff Livitoto</span>
-                </li>
-                <li class="menu-item" data-content="hmd29">
-                    <i class="fas fa-user-friends"></i>
-                    <span>Data Staff Hmd29</span>
-                </li>
-                <li class="menu-item" data-content="peraturan">
-                    <i class="fas fa-book"></i>
-                    <span>Peraturan</span>
-                </li>
-                <li class="menu-item" data-content="noted">
-                    <i class="fas fa-sticky-note"></i>
-                    <span>Noted</span>
-                </li>
-                <li class="menu-item" data-content="users">
-                    <i class="fas fa-user-circle"></i>
-                    <span>Users</span>
-                </li>
-            </ul>
-        </div>
-
-        <!-- Main Content -->
-        <div class="main-content">
-            <header class="header">
-                <div class="header-left">
-                    <button class="menu-toggle" id="menuToggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h1 id="pageTitle">Dashboard Home</h1>
-                </div>
-                <div class="header-right">
-                    <div class="user-profile" id="userProfile">
-                        <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=0366d6&color=fff" alt="User">
-                        <span id="userName">Memuat...</span>
-                        <button id="logoutBtn" class="btn-logout" style="margin-left: 10px; background:#e74c3c; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">
-                            <i class="fas fa-sign-out-alt"></i> Logout
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            <div class="content-area">
-                <div id="home-content" class="content-section active">
-                    <div class="welcome-section">
-                        <h2>Selamat Datang di Dashboard</h2>
-                        <p>Setiap hari adalah kesempatan baru untuk menjadi versi terbaik dari diri kita.<br><br>
-                        Jangan fokus pada lelahnya, tapi nikmati prosesnya. Karena dari setiap tantangan, kita belajar menjadi lebih kuat, lebih tangguh, dan lebih berpengalaman.<br><br>
-                        Mari buktikan bahwa tim kita bukan hanya bekerja, tapi juga berkarya dan berprestasi dengan penuh semangat!</p>
-                    </div>
-                </div>
-
-                <!-- (bagian konten lain tetap seperti punyamu, tidak dihapus) -->
-            </div>
-        </div>
+  <div class="dashboard-container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="logo">
+        <h2><i class="fas fa-chart-line"></i> Dashboard</h2>
+        <p id="userEmail" style="font-size: 0.85em; color: #bbb; margin-top: 5px;">Memuat...</p>
+      </div>
+      <ul class="menu">
+        <li class="menu-item active" data-content="home"><i class="fas fa-home"></i> <span>Dashboard Home</span></li>
+        <li class="menu-item" data-content="hatoribet"><i class="fas fa-users"></i> <span>Data Staff Hatoribet</span></li>
+        <li class="menu-item" data-content="livitoto"><i class="fas fa-user-tie"></i> <span>Data Staff Livitoto</span></li>
+        <li class="menu-item" data-content="hmd29"><i class="fas fa-user-friends"></i> <span>Data Staff Hmd29</span></li>
+        <li class="menu-item" data-content="peraturan"><i class="fas fa-book"></i> <span>Peraturan</span></li>
+        <li class="menu-item" data-content="noted"><i class="fas fa-sticky-note"></i> <span>Noted</span></li>
+        <li class="menu-item" data-content="users"><i class="fas fa-user-circle"></i> <span>Users</span></li>
+      </ul>
     </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js";
+    <!-- Main Content -->
+    <div class="main-content">
+      <header class="header">
+        <div class="header-left">
+          <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+          <h1 id="pageTitle">Dashboard Home</h1>
+        </div>
+        <div class="header-right">
+          <div class="user-profile">
+            <img id="userAvatar" src="https://ui-avatars.com/api/?name=User&background=0366d6&color=fff" alt="User">
+            <span id="userName">Memuat...</span>
+            <button id="logoutBtn" class="btn-logout" style="margin-left: 10px; background:#e74c3c; color:white; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;">
+              <i class="fas fa-sign-out-alt"></i> Logout
+            </button>
+          </div>
+        </div>
+      </header>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyClRE2w0JeSj81gkccPC1au3hG8lQYbLzw",
-    authDomain: "dashboard-png.firebaseapp.com",
-    projectId: "dashboard-png",
-    storageBucket: "dashboard-png.firebasestorage.app",
-    messagingSenderId: "121187805643",
-    appId: "1:121187805643:web:6c67dd587abbe09f782e4e",
-    measurementId: "G-N5MV2N5X33"
-  };
+      <div class="content-area">
+        <div id="home-content" class="content-section active">
+          <div class="welcome-section">
+            <h2>Selamat Datang di Dashboard</h2>
+            <p>
+              Setiap hari adalah kesempatan baru untuk menjadi versi terbaik dari diri kita.<br><br>
+              Jangan fokus pada lelahnya, tapi nikmati prosesnya. Karena dari setiap tantangan, kita belajar menjadi lebih kuat, lebih tangguh, dan lebih berpengalaman.<br><br>
+              Mari buktikan bahwa tim kita bukan hanya bekerja, tapi juga berkarya dan berprestasi dengan penuh semangat!
+            </p>
+          </div>
+        </div>
 
-  // 🔥 Inisialisasi Firebase
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+        <!-- Konten lainnya tetap -->
+      </div>
+    </div>
+  </div>
 
-  // 🔐 Cek apakah user login
-  onAuthStateChanged(auth, (user) => {
-    if (!user) {
-      // Kalau belum login, lempar balik ke halaman login
-      window.location.href = "login.html";
-    } else {
-      console.log("User terdeteksi:", user.email);
-      const profile = document.querySelector('.user-profile span');
-      if (profile) profile.textContent = user.email;
+  <!-- FIREBASE LOGIN CHECK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-      // Tambahkan tombol logout
-      const headerRight = document.querySelector('.header-right');
-      const logoutBtn = document.createElement('button');
-      logoutBtn.textContent = "Logout";
-      logoutBtn.classList.add("btn-secondary");
-      logoutBtn.style.marginLeft = "10px";
-      headerRight.appendChild(logoutBtn);
+    const firebaseConfig = {
+      apiKey: "AIzaSyClRE2w0JeSj81gkccPC1au3hG8lQYbLzw",
+      authDomain: "dashboard-png.firebaseapp.com",
+      projectId: "dashboard-png",
+      storageBucket: "dashboard-png.firebasestorage.app",
+      messagingSenderId: "121187805643",
+      appId: "1:121187805643:web:6c67dd587abbe09f782e4e",
+      measurementId: "G-N5MV2N5X33"
+    };
 
-      logoutBtn.addEventListener('click', async () => {
-        await signOut(auth);
-        window.location.href = "login.html";
-      });
-    }
-  });
-</script>
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
+    // 🔐 Cek status login
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        // Kalau belum login, lempar balik ke halaman login utama
+        window.location.href = "index.html";
+      } else {
+        console.log("✅ Login terdeteksi:", user.email);
+        document.getElementById("userEmail").textContent = user.email;
+        document.getElementById("userName").textContent = user.email.split('@')[0];
+        document.getElementById("userAvatar").src = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.email.split('@')[0])}&background=0366d6&color=fff`;
+      }
+    });
 
-    <script src="script.js"></script>
+    // 🚪 Logout handler
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
+      await signOut(auth);
+      window.location.href = "index.html";
+    });
+  </script>
+
+  <script src="script.js"></script>
 </body>
 </html>
-
