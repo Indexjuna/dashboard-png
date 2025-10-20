@@ -1527,4 +1527,12 @@ body::before {
 
 .glow {
     animation: glow 3s ease-in-out infinite;
+
+}
+body.admin-role {
+  --primary-color: #2ecc71;
+}
+
+body.admin-role .header {
+  background: linear-gradient(135deg, #2ecc71, #27ae60);
 }
