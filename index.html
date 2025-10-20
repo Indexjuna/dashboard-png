@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - Dashboard Data Staff</title>
-  <link rel="stylesheet" href="style.css">
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="login-container">
-    <div class="login-card">
+    <div class="login-card floating">
       <div class="login-logo">
         <h1><i class="fas fa-chart-line"></i> Dashboard Staff</h1>
       </div>
@@ -22,76 +22,78 @@
       <div id="errorMessage" class="error-message"></div>
       <div id="successMessage" class="success-message"></div>
 
-      <!-- Login -->
+      <!-- Login Form -->
       <form id="loginForm" class="login-form active">
         <div class="form-group">
-          <label for="loginEmail">Email</label>
-          <input id="loginEmail" type="email" required placeholder="Masukkan email Anda" />
+          <label>Email</label>
+          <input type="email" id="loginEmail" required placeholder="Masukkan email Anda" />
         </div>
         <div class="form-group">
-          <label for="loginPassword">Password</label>
-          <input id="loginPassword" type="password" required placeholder="Masukkan password Anda" />
+          <label>Password</label>
+          <input type="password" id="loginPassword" required placeholder="Masukkan password Anda" />
         </div>
         <button type="submit" class="btn-login">Masuk ke Dashboard</button>
       </form>
 
-      <!-- Register -->
+      <!-- Register Form -->
       <form id="registerForm" class="login-form">
         <div class="form-group">
-          <label for="registerName">Nama Lengkap</label>
-          <input id="registerName" type="text" required placeholder="Masukkan nama lengkap" />
+          <label>Nama Lengkap</label>
+          <input type="text" id="registerName" required placeholder="Nama lengkap" />
         </div>
         <div class="form-group">
-          <label for="registerEmail">Email</label>
-          <input id="registerEmail" type="email" required placeholder="Masukkan email Anda" />
+          <label>Email</label>
+          <input type="email" id="registerEmail" required placeholder="Email Anda" />
         </div>
         <div class="form-group">
-          <label for="registerPassword">Password</label>
-          <input id="registerPassword" type="password" required placeholder="Buat password minimal 6 karakter" />
+          <label>Password</label>
+          <input type="password" id="registerPassword" required placeholder="Minimal 6 karakter" />
         </div>
         <div class="form-group">
-          <label for="registerConfirmPassword">Konfirmasi Password</label>
-          <input id="registerConfirmPassword" type="password" required placeholder="Ulangi password Anda" />
+          <label>Konfirmasi Password</label>
+          <input type="password" id="registerConfirmPassword" required placeholder="Ulangi password" />
         </div>
-        <button type="submit" class="btn-login">Daftar Akun Baru</button>
+        <button type="submit" class="btn-login">Daftar</button>
       </form>
     </div>
   </div>
 
-  <!-- SCRIPT FIREBASE -->
   <script type="module">
     import { auth, db } from "./firebase.js";
-    import { createUserWithEmailAndPassword, signInWithEmailAndPassword } 
-      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { doc, setDoc, getDoc, serverTimestamp } 
-      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { 
+      createUserWithEmailAndPassword, 
+      signInWithEmailAndPassword 
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { 
+      doc, setDoc, getDoc, serverTimestamp 
+    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-    const tabs = document.querySelectorAll(".login-tab");
-    const forms = document.querySelectorAll(".login-form");
-    const errorBox = document.getElementById("errorMessage");
-    const successBox = document.getElementById("successMessage");
+    const tabs = document.querySelectorAll('.login-tab');
+    const forms = document.querySelectorAll('.login-form');
+    const errorBox = document.getElementById('errorMessage');
+    const successBox = document.getElementById('successMessage');
 
-    function showError(msg){ errorBox.textContent = msg; errorBox.style.display = "block"; successBox.style.display = "none"; }
-    function showSuccess(msg){ successBox.textContent = msg; successBox.style.display = "block"; errorBox.style.display = "none"; }
+    function showError(msg){ errorBox.textContent = msg; errorBox.style.display = 'block'; successBox.style.display = 'none'; }
+    function showSuccess(msg){ successBox.textContent = msg; successBox.style.display = 'block'; errorBox.style.display = 'none'; }
 
-    tabs.forEach(tab=>{
-      tab.addEventListener("click",()=>{
-        tabs.forEach(t=>t.classList.remove("active"));
-        tab.classList.add("active");
-        forms.forEach(f=>f.classList.remove("active"));
-        document.getElementById(`${tab.dataset.tab}Form`).classList.add("active");
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        forms.forEach(f => f.classList.remove('active'));
+        document.getElementById(`${tab.dataset.tab}Form`).classList.add('active');
       });
     });
 
-    async function ensureUserDoc(userAuth, displayName) {
-      const userRef = doc(db, "users", userAuth.uid);
+    async function ensureUserDoc(user, displayName) {
+      const userRef = doc(db, "users", user.uid);
       const snap = await getDoc(userRef);
       if (!snap.exists()) {
-        const isAdmin = userAuth.email === "admin@company.com";
+        const isAdmin = user.email === "admin@company.com";
         await setDoc(userRef, {
-          uid: userAuth.uid,
-          email: userAuth.email,
-          username: displayName || userAuth.email.split("@")[0],
+          uid: user.uid,
+          email: user.email,
+          username: displayName || user.email.split('@')[0],
           role: isAdmin ? "admin" : "staff",
           canEdit: isAdmin,
           createdAt: serverTimestamp()
@@ -99,7 +101,7 @@
       }
     }
 
-    document.getElementById("registerForm").addEventListener("submit", async e=>{
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const name = registerName.value.trim();
       const email = registerEmail.value.trim().toLowerCase();
@@ -107,23 +109,27 @@
       const confirm = registerConfirmPassword.value;
       if (pass !== confirm) return showError("Konfirmasi password tidak cocok");
       try {
-        const res = await createUserWithEmailAndPassword(auth,email,pass);
-        await ensureUserDoc(res.user,name);
-        showSuccess("Pendaftaran berhasil! Mengalihkan...");
-        setTimeout(()=>location.href="dashboard.html",700);
-      } catch(err){ showError(err.message); }
+        const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+        await ensureUserDoc(userCred.user, name);
+        showSuccess("Registrasi berhasil! Mengalihkan...");
+        setTimeout(() => location.href = "dashboard.html", 1000);
+      } catch (err) {
+        showError(err.message);
+      }
     });
 
-    document.getElementById("loginForm").addEventListener("submit", async e=>{
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const email = loginEmail.value.trim().toLowerCase();
       const pass = loginPassword.value;
       try {
-        const res = await signInWithEmailAndPassword(auth,email,pass);
-        await ensureUserDoc(res.user);
-        showSuccess("Login berhasil! Mengalihkan...");
-        setTimeout(()=>location.href="dashboard.html",700);
-      } catch(err){ showError(err.message); }
+        const userCred = await signInWithEmailAndPassword(auth, email, pass);
+        await ensureUserDoc(userCred.user);
+        showSuccess("Login berhasil!");
+        setTimeout(() => location.href = "dashboard.html", 800);
+      } catch (err) {
+        showError(err.message);
+      }
     });
   </script>
 </body>
