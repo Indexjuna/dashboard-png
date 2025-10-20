@@ -86,12 +86,12 @@
     <button class="submit" id="submitBtn">Masuk</button>
   </div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <!-- ✅ Gunakan versi modular Firebase modern -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  <script>
     // 🔥 Firebase Config kamu
     const firebaseConfig = {
       apiKey: "AIzaSyDt0pviC800bgk0t6zDPnN3GJSGdMKMj4",
@@ -103,10 +103,10 @@
       measurementId: "G-EVGPRQQG1F"
     };
 
-    // 🔧 Inisialisasi Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
+    // 🚀 Inisialisasi Firebase modular
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
     // Elemen UI
     const loginTab = document.getElementById("loginTab");
@@ -146,12 +146,12 @@
 
       try {
         if (mode === "login") {
-          await auth.signInWithEmailAndPassword(email, password);
+          await signInWithEmailAndPassword(auth, email, password);
           window.location.href = "dashboard.html";
         } else {
-          const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+          const userCredential = await createUserWithEmailAndPassword(auth, email, password);
           const user = userCredential.user;
-          await db.collection("users").doc(user.uid).set({
+          await setDoc(doc(db, "users", user.uid), {
             email: email,
             role: "staff",
             createdAt: new Date()
